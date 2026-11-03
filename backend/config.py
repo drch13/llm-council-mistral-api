@@ -6,14 +6,16 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 
-def _env_path() -> Path:
-    """Location of the .env file: next to the .exe when frozen, repo root otherwise."""
+def _app_dir() -> Path:
+    """Base directory for local files: next to the .exe when frozen, repo root otherwise."""
     if getattr(sys, "frozen", False):
-        return Path(sys.executable).resolve().parent / ".env"
-    return Path(__file__).resolve().parents[1] / ".env"
+        return Path(sys.executable).resolve().parent
+    return Path(__file__).resolve().parents[1]
 
 
-ENV_PATH = _env_path()
+APP_DIR = _app_dir()
+
+ENV_PATH = APP_DIR / ".env"
 
 load_dotenv(ENV_PATH)
 
@@ -38,5 +40,9 @@ MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions"
 # Mistral API models endpoint (used to validate API keys)
 MISTRAL_MODELS_URL = "https://api.mistral.ai/v1/models"
 
-# Data directory for conversation storage
-DATA_DIR = "data/conversations"
+# Data directory for conversation storage (absolute next to the .exe when frozen,
+# so it does not depend on the process working directory)
+if getattr(sys, "frozen", False):
+    DATA_DIR = str(APP_DIR / "data" / "conversations")
+else:
+    DATA_DIR = "data/conversations"
