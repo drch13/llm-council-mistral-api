@@ -1,8 +1,23 @@
-"""OpenRouter API client for making LLM requests."""
+"""Mistral API client for making LLM requests."""
 
 import httpx
 from typing import List, Dict, Any, Optional
-from .config import OPENROUTER_API_KEY, OPENROUTER_API_URL
+from .config import MISTRAL_API_KEY, MISTRAL_API_URL
+
+
+def _extract_content(message: Dict[str, Any]) -> Optional[str]:
+    """Extract text content from a Mistral message (string or chunk list)."""
+    content = message.get('content')
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts = [
+            chunk.get('text', '')
+            for chunk in content
+            if isinstance(chunk, dict) and chunk.get('type') == 'text'
+        ]
+        return ''.join(parts) if parts else None
+    return None
 
 
 async def query_model(
@@ -11,10 +26,10 @@ async def query_model(
     timeout: float = 120.0
 ) -> Optional[Dict[str, Any]]:
     """
-    Query a single model via OpenRouter API.
+    Query a single model via the Mistral API.
 
     Args:
-        model: OpenRouter model identifier (e.g., "openai/gpt-4o")
+        model: Mistral model identifier (e.g., "mistral-large-4-0")
         messages: List of message dicts with 'role' and 'content'
         timeout: Request timeout in seconds
 
@@ -22,7 +37,7 @@ async def query_model(
         Response dict with 'content' and optional 'reasoning_details', or None if failed
     """
     headers = {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Authorization": f"Bearer {MISTRAL_API_KEY}",
         "Content-Type": "application/json",
     }
 
@@ -34,7 +49,7 @@ async def query_model(
     try:
         async with httpx.AsyncClient(timeout=timeout) as client:
             response = await client.post(
-                OPENROUTER_API_URL,
+                MISTRAL_API_URL,
                 headers=headers,
                 json=payload
             )
@@ -44,7 +59,7 @@ async def query_model(
             message = data['choices'][0]['message']
 
             return {
-                'content': message.get('content'),
+                'content': _extract_content(message),
                 'reasoning_details': message.get('reasoning_details')
             }
 
@@ -61,7 +76,7 @@ async def query_models_parallel(
     Query multiple models in parallel.
 
     Args:
-        models: List of OpenRouter model identifiers
+        models: List of Mistral model identifiers
         messages: List of message dicts to send to each model
 
     Returns:
