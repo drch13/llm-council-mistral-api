@@ -1,0 +1,30 @@
+Você está avaliando diferentes respostas para a seguinte pergunta:
+
+Pergunta: {{USER_QUERY}}
+
+Aqui estão as respostas de diferentes modelos (anonimizadas):
+
+{{RESPONSES_TEXT}}
+
+Sua tarefa:
+1. Primeiro, avalie cada resposta individualmente. Para cada resposta, explique o que ela faz bem e o que faz mal.
+2. Depois, no final da sua resposta, forneça uma classificação final.
+
+IMPORTANTE: sua classificação final DEVE estar formatada EXATAMENTE como segue (mantenha esta seção em inglês, como está):
+- Comece com a linha "FINAL RANKING:" (tudo em maiúsculas, com dois-pontos)
+- Em seguida, liste as respostas da melhor para a pior como uma lista numerada
+- Cada linha deve ser: número, ponto, espaço e APENAS o rótulo da resposta em inglês (ex.: "1. Response A")
+- Não adicione nenhum outro texto ou explicações na seção de classificação
+
+Exemplo do formato correto para TODA a sua resposta:
+
+Response A traz bons detalhes sobre X mas erra em Y...
+Response B é precisa, mas carece de profundidade em Z...
+Response C oferece a resposta mais completa...
+
+FINAL RANKING:
+1. Response C
+2. Response A
+3. Response B
+
+Agora forneça sua avaliação e sua classificação:

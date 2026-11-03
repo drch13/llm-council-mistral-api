@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { api } from '../api';
+import { LANGUAGES } from '../i18n';
 import './SettingsModal.css';
 
-export default function SettingsModal({ onClose }) {
+export default function SettingsModal({ onClose, t, language, onLanguageChange }) {
   const [apiKey, setApiKey] = useState('');
   const [showKey, setShowKey] = useState(false);
   const [status, setStatus] = useState(null);
+  const [selectedLanguage, setSelectedLanguage] = useState(language || 'en');
   const [message, setMessage] = useState(null);
   const [saving, setSaving] = useState(false);
 
@@ -22,12 +24,9 @@ export default function SettingsModal({ onClose }) {
     try {
       const result = await api.saveApiKey(apiKey);
       if (result.key_valid === true) {
-        setMessage({ type: 'success', text: 'API key saved and validated by the Mistral API.' });
+        setMessage({ type: 'success', text: t('save_success_validated') });
       } else {
-        setMessage({
-          type: 'success',
-          text: 'API key saved. It could not be validated now (check your connection); it will be checked on first use.',
-        });
+        setMessage({ type: 'success', text: t('save_success_unvalidated') });
       }
       setApiKey('');
       setStatus(await api.getApiKeyStatus());
@@ -38,18 +37,30 @@ export default function SettingsModal({ onClose }) {
     }
   };
 
+  const handleLanguageChange = async (e) => {
+    const lang = e.target.value;
+    setSelectedLanguage(lang);
+    try {
+      await api.saveLanguage(lang);
+      onLanguageChange(lang);
+      setMessage({ type: 'success', text: t('language_saved') });
+    } catch (error) {
+      setMessage({ type: 'error', text: error.message });
+    }
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Settings</h2>
+          <h2>{t('settings').replace('⚙ ', '')}</h2>
           <button className="modal-close" onClick={onClose}>
             &times;
           </button>
         </div>
         <div className="modal-body">
           <label className="settings-label" htmlFor="mistral-api-key">
-            Mistral API Key
+            {t('api_key_label')}
           </label>
           <div className="api-key-input-row">
             <input
@@ -59,8 +70,8 @@ export default function SettingsModal({ onClose }) {
               onChange={(e) => setApiKey(e.target.value)}
               placeholder={
                 status?.configured
-                  ? `Current key: ${status.masked}`
-                  : 'Enter your Mistral API key'
+                  ? t('current_key', { masked: status.masked })
+                  : t('api_key_placeholder')
               }
             />
             <button
@@ -68,13 +79,27 @@ export default function SettingsModal({ onClose }) {
               className="toggle-visibility-btn"
               onClick={() => setShowKey(!showKey)}
             >
-              {showKey ? 'Hide' : 'Show'}
+              {showKey ? t('hide') : t('show')}
             </button>
           </div>
-          <p className="settings-hint">
-            Get your key at console.mistral.ai. It is stored locally in the .env
-            file and only used to call the Mistral API.
-          </p>
+          <p className="settings-hint">{t('settings_hint')}</p>
+
+          <label className="settings-label settings-language-label" htmlFor="language-select">
+            {t('language_label')}
+          </label>
+          <select
+            id="language-select"
+            className="language-select"
+            value={selectedLanguage}
+            onChange={handleLanguageChange}
+          >
+            {LANGUAGES.map((l) => (
+              <option key={l.code} value={l.code}>
+                {l.label}
+              </option>
+            ))}
+          </select>
+
           {message && (
             <div className={`settings-message ${message.type}`}>{message.text}</div>
           )}
@@ -85,7 +110,7 @@ export default function SettingsModal({ onClose }) {
             onClick={handleSave}
             disabled={saving || !apiKey.trim()}
           >
-            {saving ? 'Saving...' : 'Save'}
+            {saving ? t('saving') : t('save')}
           </button>
         </div>
       </div>

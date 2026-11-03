@@ -29,7 +29,7 @@ jobs:
           npm run build
 
       - name: Package executable with PyInstaller
-        run: uv run --with pyinstaller pyinstaller --onefile --name LLM-Council --collect-all uvicorn --add-data "frontend/dist;dist" run_app.py
+        run: uv run --with pyinstaller pyinstaller --onefile --name LLM-Council --collect-all uvicorn --add-data "frontend/dist;dist" --add-data "backend/prompts;backend/prompts" run_app.py
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

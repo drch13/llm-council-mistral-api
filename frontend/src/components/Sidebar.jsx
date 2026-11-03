@@ -7,19 +7,20 @@ export default function Sidebar({
   onSelectConversation,
   onNewConversation,
   onOpenSettings,
+  t,
 }) {
   return (
     <div className="sidebar">
       <div className="sidebar-header">
         <h1>LLM Council</h1>
         <button className="new-conversation-btn" onClick={onNewConversation}>
-          + New Conversation
+          {t('new_conversation')}
         </button>
       </div>
 
       <div className="conversation-list">
         {conversations.length === 0 ? (
-          <div className="no-conversations">No conversations yet</div>
+          <div className="no-conversations">{t('no_conversations')}</div>
         ) : (
           conversations.map((conv) => (
             <div
@@ -33,7 +34,7 @@ export default function Sidebar({
                 {conv.title || 'New Conversation'}
               </div>
               <div className="conversation-meta">
-                {conv.message_count} messages
+                {t('messages_count', { count: conv.message_count })}
               </div>
             </div>
           ))
@@ -42,7 +43,7 @@ export default function Sidebar({
 
       <div className="sidebar-footer">
         <button className="settings-btn" onClick={onOpenSettings}>
-          ⚙ Settings
+          {t('settings')}
         </button>
       </div>
     </div>

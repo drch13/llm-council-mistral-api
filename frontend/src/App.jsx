@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Sidebar from './components/Sidebar';
 import ChatInterface from './components/ChatInterface';
 import SettingsModal from './components/SettingsModal';
 import { api } from './api';
+import { createT } from './i18n';
 import './App.css';
 
 function App() {
@@ -11,10 +12,14 @@ function App() {
   const [currentConversation, setCurrentConversation] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [language, setLanguage] = useState('en');
 
-  // Load conversations on mount
+  const t = useMemo(() => createT(language), [language]);
+
+  // Load conversations and language on mount
   useEffect(() => {
     loadConversations();
+    api.getLanguage().then((d) => setLanguage(d.language)).catch(() => {});
   }, []);
 
   // Load conversation details when selected
@@ -191,13 +196,22 @@ function App() {
         onSelectConversation={handleSelectConversation}
         onNewConversation={handleNewConversation}
         onOpenSettings={() => setSettingsOpen(true)}
+        t={t}
       />
       <ChatInterface
         conversation={currentConversation}
         onSendMessage={handleSendMessage}
         isLoading={isLoading}
+        t={t}
       />
-      {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
+      {settingsOpen && (
+        <SettingsModal
+          onClose={() => setSettingsOpen(false)}
+          t={t}
+          language={language}
+          onLanguageChange={setLanguage}
+        />
+      )}
     </div>
   );
 }

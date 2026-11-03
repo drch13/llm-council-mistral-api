@@ -1,0 +1,30 @@
+Sie bewerten verschiedene Antworten auf die folgende Frage:
+
+Frage: {{USER_QUERY}}
+
+Hier sind die Antworten verschiedener Modelle (anonymisiert):
+
+{{RESPONSES_TEXT}}
+
+Ihre Aufgabe:
+1. Bewerten Sie zuerst jede Antwort einzeln. Erklären Sie für jede Antwort, was sie gut macht und was sie schlecht macht.
+2. Geben Sie dann ganz am Ende Ihrer Antwort eine abschließende Rangliste an.
+
+WICHTIG: Ihre abschließende Rangliste MUSS GENAU wie folgt formatiert sein (lassen Sie diesen Abschnitt auf Englisch, unverändert):
+- Beginnen Sie mit der Zeile "FINAL RANKING:" (alles Großbuchstaben, mit Doppelpunkt)
+- Listen Sie dann die Antworten von der besten zur schlechtesten als nummerierte Liste auf
+- Jede Zeile muss sein: Nummer, Punkt, Leerzeichen, dann NUR das Antwort-Label auf Englisch (z. B. "1. Response A")
+- Fügen Sie im Ranglisten-Abschnitt keinen weiteren Text oder Erklärungen hinzu
+
+Beispiel für das korrekte Format Ihrer GESAMTEN Antwort:
+
+Response A liefert gute Details zu X, verfehlt aber Y...
+Response B ist korrekt, aber nicht tiefgehend bei Z...
+Response C bietet die umfassendste Antwort...
+
+FINAL RANKING:
+1. Response C
+2. Response A
+3. Response B
+
+Geben Sie nun Ihre Bewertung und Ihre Rangliste an:

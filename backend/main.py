@@ -58,6 +58,11 @@ class ApiKeyRequest(BaseModel):
     api_key: str
 
 
+class LanguageRequest(BaseModel):
+    """Request to set the UI/prompt language."""
+    language: str
+
+
 class ConversationMetadata(BaseModel):
     """Conversation metadata for list view."""
     id: str
@@ -125,6 +130,26 @@ async def save_api_key(request: ApiKeyRequest):
     config.MISTRAL_API_KEY = key
 
     return {"ok": True, "key_valid": key_valid}
+
+
+@app.get("/api/settings/language")
+async def get_language():
+    """Return the current UI/prompt language."""
+    return {"language": config.LANGUAGE}
+
+
+@app.post("/api/settings/language")
+async def save_language(request: LanguageRequest):
+    """Save the UI/prompt language to the local .env file."""
+    lang = request.language.strip().lower()
+    if lang not in config.SUPPORTED_LANGUAGES:
+        return JSONResponse(
+            status_code=400,
+            content={"ok": False, "error": f"Unsupported language: {lang}"},
+        )
+    set_key(str(config.ENV_PATH), "LANGUAGE", lang)
+    config.LANGUAGE = lang
+    return {"ok": True, "language": lang}
 
 
 @app.get("/api/conversations", response_model=List[ConversationMetadata])

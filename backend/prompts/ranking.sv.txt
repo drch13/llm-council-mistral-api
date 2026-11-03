@@ -1,0 +1,30 @@
+Du utvärderar olika svar på följande fråga:
+
+Fråga: {{USER_QUERY}}
+
+Här är svaren från olika modeller (anonymiserade):
+
+{{RESPONSES_TEXT}}
+
+Din uppgift:
+1. Börja med att utvärdera varje svar individuellt. För varje svar, förklara vad det gör bra och vad det gör dåligt.
+2. Ge sedan, allra sist i ditt svar, en slutlig rangordning.
+
+VIKTIGT: Din slutliga rangordning MÅSTE vara formaterad EXAKT enligt följande (lämna detta avsnitt på engelska, oförändrat):
+- Börja med raden "FINAL RANKING:" (enbart versaler, med kolon)
+- Lista sedan svaren från bäst till sämst som en numrerad lista
+- Varje rad ska vara: nummer, punkt, mellanslag, sedan ENDAST svarets etikett på engelska (t.ex. "1. Response A")
+- Lägg inte till någon annan text eller förklaringar i rangordningsavsnittet
+
+Exempel på korrekt format för HELA ditt svar:
+
+Response A ger bra detaljer om X men missar Y...
+Response B är korrekt men saknar djup om Z...
+Response C erbjuder det mest heltäckande svaret...
+
+FINAL RANKING:
+1. Response C
+2. Response A
+3. Response B
+
+Ge nu din utvärdering och din rangordning:

@@ -1,17 +1,17 @@
 import ReactMarkdown from 'react-markdown';
 import './Stage3.css';
 
-export default function Stage3({ finalResponse, modelErrors }) {
+export default function Stage3({ finalResponse, modelErrors, t }) {
   if (!finalResponse) {
     return null;
   }
 
   return (
     <div className="stage stage3">
-      <h3 className="stage-title">Stage 3: Final Council Answer</h3>
+      <h3 className="stage-title">{t('stage3_title')}</h3>
       <div className="final-response">
         <div className="chairman-label">
-          Chairman: {finalResponse.model.split('/')[1] || finalResponse.model}
+          {t('chairman')} {finalResponse.model.split('/')[1] || finalResponse.model}
         </div>
         <div className="final-text markdown-content">
           <ReactMarkdown>{finalResponse.response}</ReactMarkdown>
@@ -19,9 +19,7 @@ export default function Stage3({ finalResponse, modelErrors }) {
       </div>
       {modelErrors && modelErrors.length > 0 && (
         <div className="model-errors-box">
-          <div className="model-errors-title">
-            ⚠ Some council members were unavailable during this exchange:
-          </div>
+          <div className="model-errors-title">{t('model_errors_title')}</div>
           <ul className="model-errors-list">
             {modelErrors.map((e, i) => (
               <li key={i}>

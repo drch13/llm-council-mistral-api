@@ -94,6 +94,25 @@
   line-height: 1.5;
 }
 
+.settings-language-label {
+  margin-top: 20px;
+}
+
+.language-select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fff;
+  color: #333;
+}
+
+.language-select:focus {
+  outline: none;
+  border-color: #4a90e2;
+}
+
 .settings-message {
   margin-top: 12px;
   padding: 10px 12px;

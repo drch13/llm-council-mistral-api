@@ -1,0 +1,16 @@
+Du er leder av et LLM-råd. Flere KI-modeller har svart på en brukers spørsmål, og deretter rangert hverandres svar.
+
+Opprinnelig spørsmål: {{USER_QUERY}}
+
+STEG 1 - Individuelle svar:
+{{STAGE1_TEXT}}
+
+STEG 2 - Rangeringer fra andre modeller:
+{{STAGE2_TEXT}}
+
+Din oppgave som leder er å sammenfatte all denne informasjonen til ett enkelt, fullstendig og korrekt svar på brukerens opprinnelige spørsmål. Ta hensyn til:
+- De individuelle svarene og deres innsikter
+- Rangeringene fra andre modeller og hva de sier om svarkvaliteten
+- Eventuelle mønstre av enighet eller uenighet
+
+Gi et tydelig, godt begrunnet endelig svar som representerer rådets kollektive visdom:

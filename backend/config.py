@@ -37,6 +37,10 @@ CHAIRMAN_MODEL = "mistral-large-4-0"
 # Mistral API endpoint
 MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions"
 
+# UI / prompt language (ISO code, e.g. "en", "fr")
+SUPPORTED_LANGUAGES = ["en", "fr", "it", "de", "es", "pt", "sv", "no", "el"]
+LANGUAGE = os.getenv("LANGUAGE", "en")
+
 # Mistral API models endpoint (used to validate API keys)
 MISTRAL_MODELS_URL = "https://api.mistral.ai/v1/models"
 

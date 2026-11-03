@@ -37,6 +37,35 @@ export const api = {
   },
 
   /**
+   * Get the current UI/prompt language.
+   */
+  async getLanguage() {
+    const response = await fetch(`${API_BASE}/api/settings/language`);
+    if (!response.ok) {
+      throw new Error('Failed to get language');
+    }
+    return response.json();
+  },
+
+  /**
+   * Save the UI/prompt language to the local .env file.
+   */
+  async saveLanguage(language) {
+    const response = await fetch(`${API_BASE}/api/settings/language`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ language }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to save language');
+    }
+    return data;
+  },
+
+  /**
    * List all conversations.
    */
   async listConversations() {

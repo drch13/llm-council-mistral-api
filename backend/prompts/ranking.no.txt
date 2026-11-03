@@ -1,0 +1,30 @@
+Du vurderer forskjellige svar på følgende spørsmål:
+
+Spørsmål: {{USER_QUERY}}
+
+Her er svarene fra forskjellige modeller (anonymisert):
+
+{{RESPONSES_TEXT}}
+
+Din oppgave:
+1. Først vurderer du hvert svar individuelt. For hvert svar, forklar hva det gjør bra og hva det gjør dårlig.
+2. Til slutt, helt på slutten av svaret ditt, gi en endelig rangering.
+
+VIKTIG: Den endelige rangeringen DIN MÅ være formatert NØYAKTIG som følger (la denne delen være på engelsk, uendret):
+- Start med linjen "FINAL RANKING:" (kun store bokstaver, med kolon)
+- List deretter svarene fra best til verst som en nummerert liste
+- Hver linje skal være: nummer, punktum, mellomrom, deretter KUN svarets etikett på engelsk (f.eks. "1. Response A")
+- Ikke legg til annen tekst eller forklaringer i rangeringsdelen
+
+Eksempel på korrekt format for HELE svaret ditt:
+
+Response A gir gode detaljer om X men bommer på Y...
+Response B er korrekt men mangler dybde om Z...
+Response C gir det mest fullstendige svaret...
+
+FINAL RANKING:
+1. Response C
+2. Response A
+3. Response B
+
+Gi nå din vurdering og din rangering:

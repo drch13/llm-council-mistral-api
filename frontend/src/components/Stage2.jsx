@@ -14,7 +14,7 @@ function deAnonymizeText(text, labelToModel) {
   return result;
 }
 
-export default function Stage2({ rankings, labelToModel, aggregateRankings }) {
+export default function Stage2({ rankings, labelToModel, aggregateRankings, t }) {
   const [activeTab, setActiveTab] = useState(0);
 
   if (!rankings || rankings.length === 0) {
@@ -23,13 +23,10 @@ export default function Stage2({ rankings, labelToModel, aggregateRankings }) {
 
   return (
     <div className="stage stage2">
-      <h3 className="stage-title">Stage 2: Peer Rankings</h3>
+      <h3 className="stage-title">{t('stage2_title')}</h3>
 
-      <h4>Raw Evaluations</h4>
-      <p className="stage-description">
-        Each model evaluated all responses (anonymized as Response A, B, C, etc.) and provided rankings.
-        Below, model names are shown in <strong>bold</strong> for readability, but the original evaluation used anonymous labels.
-      </p>
+      <h4>{t('stage2_raw_evaluations')}</h4>
+      <p className="stage-description">{t('stage2_description')}</p>
 
       <div className="tabs">
         {rankings.map((rank, index) => (
@@ -56,7 +53,7 @@ export default function Stage2({ rankings, labelToModel, aggregateRankings }) {
         {rankings[activeTab].parsed_ranking &&
          rankings[activeTab].parsed_ranking.length > 0 && (
           <div className="parsed-ranking">
-            <strong>Extracted Ranking:</strong>
+            <strong>{t('extracted_ranking')}</strong>
             <ol>
               {rankings[activeTab].parsed_ranking.map((label, i) => (
                 <li key={i}>
@@ -72,10 +69,8 @@ export default function Stage2({ rankings, labelToModel, aggregateRankings }) {
 
       {aggregateRankings && aggregateRankings.length > 0 && (
         <div className="aggregate-rankings">
-          <h4>Aggregate Rankings (Street Cred)</h4>
-          <p className="stage-description">
-            Combined results across all peer evaluations (lower score is better):
-          </p>
+          <h4>{t('aggregate_title')}</h4>
+          <p className="stage-description">{t('aggregate_description')}</p>
           <div className="aggregate-list">
             {aggregateRankings.map((agg, index) => (
               <div key={index} className="aggregate-item">
@@ -84,10 +79,10 @@ export default function Stage2({ rankings, labelToModel, aggregateRankings }) {
                   {agg.model.split('/')[1] || agg.model}
                 </span>
                 <span className="rank-score">
-                  Avg: {agg.average_rank.toFixed(2)}
+                  {t('avg')} {agg.average_rank.toFixed(2)}
                 </span>
                 <span className="rank-count">
-                  ({agg.rankings_count} votes)
+                  {t('votes', { count: agg.rankings_count })}
                 </span>
               </div>
             ))}
