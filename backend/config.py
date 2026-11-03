@@ -5,22 +5,23 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# OpenRouter API key
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+# Mistral API key
+MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 
-# Council members - list of OpenRouter model identifiers
+# Council members - list of Mistral API model identifiers
 COUNCIL_MODELS = [
-    "openai/gpt-5.1",
-    "google/gemini-3-pro-preview",
-    "anthropic/claude-sonnet-4.5",
-    "x-ai/grok-4",
+    "mistral-large-4-0",
+    "zai-glm-5-3",
+    "deepseek-v4p1-flash-1017",
+    "mistral-small-2603",
+    "mistral-medium-3-5",
 ]
 
 # Chairman model - synthesizes final response
-CHAIRMAN_MODEL = "google/gemini-3-pro-preview"
+CHAIRMAN_MODEL = "mistral-large-4-0"
 
-# OpenRouter API endpoint
-OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
+# Mistral API endpoint
+MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions"
 
 # Data directory for conversation storage
 DATA_DIR = "data/conversations"
