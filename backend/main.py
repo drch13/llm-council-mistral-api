@@ -2,17 +2,36 @@
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List, Dict, Any
 import uuid
 import json
 import asyncio
+import sys
+from pathlib import Path
 
+import httpx
+from dotenv import set_key
+
+from . import config
 from . import storage
 from .council import run_full_council, generate_conversation_title, stage1_collect_responses, stage2_collect_rankings, stage3_synthesize_final, calculate_aggregate_rankings
 
 app = FastAPI(title="LLM Council API")
+
+
+def _frontend_dist() -> Path | None:
+    """Locate the built frontend: bundled next to the .exe when frozen, frontend/dist in dev."""
+    if getattr(sys, "frozen", False):
+        candidate = Path(getattr(sys, "_MEIPASS", Path(sys.executable).parent)) / "dist"
+    else:
+        candidate = Path(__file__).resolve().parents[1] / "frontend" / "dist"
+    return candidate if candidate.is_dir() else None
+
+
+_frontend_dist_path = _frontend_dist()
 
 # Enable CORS for local development
 app.add_middleware(
@@ -34,6 +53,11 @@ class SendMessageRequest(BaseModel):
     content: str
 
 
+class ApiKeyRequest(BaseModel):
+    """Request to save the Mistral API key."""
+    api_key: str
+
+
 class ConversationMetadata(BaseModel):
     """Conversation metadata for list view."""
     id: str
@@ -52,8 +76,55 @@ class Conversation(BaseModel):
 
 @app.get("/")
 async def root():
-    """Health check endpoint."""
+    """Serve the built frontend when available, else a health check."""
+    if _frontend_dist_path is not None:
+        return FileResponse(str(_frontend_dist_path / "index.html"))
     return {"status": "ok", "service": "LLM Council API"}
+
+
+@app.get("/api/settings/api-key")
+async def get_api_key_status():
+    """Return whether a Mistral API key is configured (masked, never the full key)."""
+    key = config.MISTRAL_API_KEY
+    if not key:
+        return {"configured": False, "masked": None}
+    masked = key[:4] + "..." + key[-4:] if len(key) > 8 else "****"
+    return {"configured": True, "masked": masked}
+
+
+@app.post("/api/settings/api-key")
+async def save_api_key(request: ApiKeyRequest):
+    """Validate and save the Mistral API key to the local .env file."""
+    key = request.api_key.strip()
+    if not key:
+        return JSONResponse(
+            status_code=400,
+            content={"ok": False, "error": "La clé API ne peut pas être vide."},
+        )
+
+    # Validate the key against the Mistral API before saving it
+    key_valid = None
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            response = await client.get(
+                config.MISTRAL_MODELS_URL,
+                headers={"Authorization": f"Bearer {key}"},
+            )
+        if response.status_code in (401, 403):
+            return JSONResponse(
+                status_code=400,
+                content={"ok": False, "error": "Clé API invalide (rejetée par l'API Mistral)."},
+            )
+        if response.status_code == 200:
+            key_valid = True
+    except Exception:
+        # Network unreachable: save anyway, the key will be checked on first use
+        key_valid = None
+
+    set_key(str(config.ENV_PATH), "MISTRAL_API_KEY", key)
+    config.MISTRAL_API_KEY = key
+
+    return {"ok": True, "key_valid": key_valid}
 
 
 @app.get("/api/conversations", response_model=List[ConversationMetadata])
@@ -192,6 +263,11 @@ async def send_message_stream(conversation_id: str, request: SendMessageRequest)
             "Connection": "keep-alive",
         }
     )
+
+
+if _frontend_dist_path is not None:
+    # Serve the built frontend (production / packaged .exe); API routes above take precedence
+    app.mount("/", StaticFiles(directory=str(_frontend_dist_path), html=True), name="frontend")
 
 
 if __name__ == "__main__":

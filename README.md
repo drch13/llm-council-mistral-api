@@ -42,6 +42,8 @@ MISTRAL_API_KEY=...
 
 Get your API key at [console.mistral.ai](https://console.mistral.ai/) (La Plateforme). Make sure your account has credits available.
 
+**Alternative (no file editing):** click the **⚙ Settings** button at the bottom of the sidebar and paste your key there. The app validates it against the Mistral API and saves it to the local `.env` file automatically (next to the executable for the packaged app, in the project root otherwise). This works the same whether you run the app in development mode or from the downloaded executable.
+
 ### 3. Configure Models (Optional)
 
 Edit `backend/config.py` to customize the council:
@@ -59,6 +61,10 @@ CHAIRMAN_MODEL = "mistral-large-4-0"
 ```
 
 ## Running the Application
+
+**Option 0: Download the Windows executable (no installation needed)**
+
+Prebuilt `.exe` files are published on the [Releases](https://github.com/drch13/llm-council-mistral-api/releases) page (built automatically by CI from tagged versions). Download `LLM-Council.exe`, double-click it: the app starts on `http://localhost:8001` and opens in your browser. Enter your Mistral API key via the ⚙ Settings button on first launch. Note: Windows may show a SmartScreen warning for unsigned executables — click "More info" then "Run anyway".
 
 **Option 1: Use the start script**
 ```bash

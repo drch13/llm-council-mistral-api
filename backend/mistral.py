@@ -2,7 +2,7 @@
 
 import httpx
 from typing import List, Dict, Any, Optional
-from .config import MISTRAL_API_KEY, MISTRAL_API_URL
+from . import config
 
 
 def _extract_content(message: Dict[str, Any]) -> Optional[str]:
@@ -37,7 +37,7 @@ async def query_model(
         Response dict with 'content' and optional 'reasoning_details', or None if failed
     """
     headers = {
-        "Authorization": f"Bearer {MISTRAL_API_KEY}",
+        "Authorization": f"Bearer {config.MISTRAL_API_KEY}",
         "Content-Type": "application/json",
     }
 
@@ -49,7 +49,7 @@ async def query_model(
     try:
         async with httpx.AsyncClient(timeout=timeout) as client:
             response = await client.post(
-                MISTRAL_API_URL,
+                config.MISTRAL_API_URL,
                 headers=headers,
                 json=payload
             )
