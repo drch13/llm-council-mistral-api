@@ -44,6 +44,8 @@ Get your API key at [console.mistral.ai](https://console.mistral.ai/) (La Platef
 
 **Alternative (no file editing):** click the **⚙ Settings** button at the bottom of the sidebar and paste your key there. The app validates it against the Mistral API and saves it to the local `.env` file automatically (next to the executable for the packaged app, in the project root otherwise). This works the same whether you run the app in development mode or from the downloaded executable.
 
+**Language:** the same **⚙ Settings** window has a language dropdown (under the API key field). The app interface and the Stage 2 / Stage 3 prompts sent to the models are available in 9 languages: English, Français, Italiano, Deutsch, Español, Português, Svenska, Norsk, Ελληνικά. The choice is saved to the local `.env` (`LANGUAGE=fr`, ...) and applies immediately, in both dev and packaged mode. Prompt templates live in `backend/prompts/` (`ranking.<lang>.txt`, `chairman.<lang>.txt`) — add a new language by dropping two new files there and adding the code to `SUPPORTED_LANGUAGES` in `backend/config.py`.
+
 ### 3. Configure Models (Optional)
 
 Edit `backend/config.py` to customize the council:
@@ -52,7 +54,7 @@ Edit `backend/config.py` to customize the council:
 COUNCIL_MODELS = [
     "mistral-large-4-0",
     "zai-glm-5-3",
-    "deepseek-v4p1-flash-1017",
+    "deepseek-v4-1-flash-1017",
     "mistral-small-2603",
     "mistral-medium-3-5",
 ]
@@ -64,7 +66,7 @@ CHAIRMAN_MODEL = "mistral-large-4-0"
 
 **Option 0: Download the Windows executable (no installation needed)**
 
-Prebuilt `.exe` files are published on the [Releases](https://github.com/drch13/llm-council-mistral-api/releases) page (built automatically by CI from tagged versions). Download `LLM-Council.exe`, double-click it: the app starts on `http://localhost:8001` and opens in your browser. Enter your Mistral API key via the ⚙ Settings button on first launch. Note: Windows may show a SmartScreen warning for unsigned executables — click "More info" then "Run anyway".
+Prebuilt `.exe` files are published on the [Releases](https://github.com/drch13/llm-council-mistral-api/releases) page. Fresh test builds are also produced automatically on every push to `master` (downloadable for 1 day as the `LLM-Council-windows` artifact in the Actions tab). Download `LLM-Council.exe`, double-click it: the app starts on `http://localhost:8001` and opens in your browser. Enter your Mistral API key via the ⚙ Settings button on first launch. Note: Windows may show a SmartScreen warning for unsigned executables — click "More info" then "Run anyway".
 
 **Option 1: Use the start script**
 ```bash
