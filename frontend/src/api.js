@@ -2,9 +2,40 @@
  * API client for the LLM Council backend.
  */
 
-const API_BASE = 'http://localhost:8001';
+// In dev (Vite on :5173) the backend is on :8001; in the packaged app the
+// frontend is served by FastAPI itself, so relative URLs hit the same origin.
+const API_BASE = import.meta.env.DEV ? 'http://localhost:8001' : '';
 
 export const api = {
+  /**
+   * Get the Mistral API key status (configured + masked key).
+   */
+  async getApiKeyStatus() {
+    const response = await fetch(`${API_BASE}/api/settings/api-key`);
+    if (!response.ok) {
+      throw new Error('Failed to get API key status');
+    }
+    return response.json();
+  },
+
+  /**
+   * Save the Mistral API key to the local .env file.
+   */
+  async saveApiKey(apiKey) {
+    const response = await fetch(`${API_BASE}/api/settings/api-key`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ api_key: apiKey }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to save API key');
+    }
+    return data;
+  },
+
   /**
    * List all conversations.
    */
