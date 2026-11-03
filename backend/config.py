@@ -26,7 +26,7 @@ MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 COUNCIL_MODELS = [
     "mistral-large-4-0",
     "zai-glm-5-3",
-    "deepseek-v4p1-flash-1017",
+    "deepseek-v4-1-flash-1017",
     "mistral-small-2603",
     "mistral-medium-3-5",
 ]

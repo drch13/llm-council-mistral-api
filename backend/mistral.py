@@ -20,6 +20,29 @@ def _extract_content(message: Dict[str, Any]) -> Optional[str]:
     return None
 
 
+def classify_error(exc: Exception) -> Dict[str, str]:
+    """Classify a request failure into a user-facing error type + message."""
+    if isinstance(exc, httpx.HTTPStatusError):
+        code = exc.response.status_code
+        if code in (401, 403):
+            return {"type": "invalid_api_key",
+                    "message": f"Invalid or missing Mistral API key (HTTP {code}). Update it via Settings."}
+        if code == 404:
+            return {"type": "model_unavailable",
+                    "message": "Model not found on the Mistral API (HTTP 404) — the model id may be wrong or retired."}
+        if code == 429:
+            return {"type": "rate_limited",
+                    "message": "Mistral API rate limit or quota exceeded (HTTP 429)."}
+        if code >= 500:
+            return {"type": "mistral_server_error",
+                    "message": f"Mistral API server error (HTTP {code})."}
+        return {"type": "http_error", "message": f"Mistral API error (HTTP {code})."}
+    if isinstance(exc, (httpx.TimeoutException, httpx.ConnectError, httpx.NetworkError)):
+        return {"type": "network_error",
+                "message": "Cannot reach the Mistral API — check your internet connection."}
+    return {"type": "unknown_error", "message": str(exc) or "Unknown error."}
+
+
 async def query_model(
     model: str,
     messages: List[Dict[str, str]],
@@ -34,8 +57,19 @@ async def query_model(
         timeout: Request timeout in seconds
 
     Returns:
-        Response dict with 'content' and optional 'reasoning_details', or None if failed
+        Response dict with 'content' and optional 'reasoning_details' on success,
+        or {'content': None, 'error': {'type', 'message'}} on failure. None only
+        if the request could not even be attempted.
     """
+    if not config.MISTRAL_API_KEY:
+        return {
+            'content': None,
+            'error': {
+                'type': 'missing_api_key',
+                'message': 'No Mistral API key configured. Add it via Settings.'
+            }
+        }
+
     headers = {
         "Authorization": f"Bearer {config.MISTRAL_API_KEY}",
         "Content-Type": "application/json",
@@ -60,12 +94,14 @@ async def query_model(
 
             return {
                 'content': _extract_content(message),
-                'reasoning_details': message.get('reasoning_details')
+                'reasoning_details': message.get('reasoning_details'),
+                'error': None
             }
 
     except Exception as e:
-        print(f"Error querying model {model}: {e}")
-        return None
+        error = classify_error(e)
+        print(f"Error querying model {model}: [{error['type']}] {error['message']}")
+        return {'content': None, 'error': error}
 
 
 async def query_models_parallel(
@@ -80,7 +116,7 @@ async def query_models_parallel(
         messages: List of message dicts to send to each model
 
     Returns:
-        Dict mapping model identifier to response dict (or None if failed)
+        Dict mapping model identifier to response dict (success or failure with 'error')
     """
     import asyncio
 

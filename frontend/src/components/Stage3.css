@@ -23,3 +23,38 @@
   line-height: 1.7;
   font-size: 15px;
 }
+
+.model-errors-box {
+  margin-top: 12px;
+  padding: 12px 16px;
+  background: #fff8e6;
+  border: 1px solid #f0d48a;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.model-errors-title {
+  color: #8a6d1a;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.model-errors-list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.model-errors-list li {
+  margin-bottom: 4px;
+}
+
+.model-error-name {
+  font-family: monospace;
+  font-weight: 600;
+  color: #333;
+  margin-right: 6px;
+}
+
+.model-error-detail {
+  color: #8a6d1a;
+}

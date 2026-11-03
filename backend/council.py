@@ -5,7 +5,7 @@ from .mistral import query_models_parallel, query_model
 from .config import COUNCIL_MODELS, CHAIRMAN_MODEL
 
 
-async def stage1_collect_responses(user_query: str) -> List[Dict[str, Any]]:
+async def stage1_collect_responses(user_query: str) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     """
     Stage 1: Collect individual responses from all council models.
 
@@ -13,29 +13,40 @@ async def stage1_collect_responses(user_query: str) -> List[Dict[str, Any]]:
         user_query: The user's question
 
     Returns:
-        List of dicts with 'model' and 'response' keys
+        Tuple of (successful results, per-model errors).
+        Results are dicts with 'model' and 'response' keys; errors are dicts
+        with 'model' and 'error' ({'type', 'message'}) keys.
     """
     messages = [{"role": "user", "content": user_query}]
 
     # Query all models in parallel
     responses = await query_models_parallel(COUNCIL_MODELS, messages)
 
-    # Format results
+    # Format results and collect failures separately (a failed model must not
+    # block the rest of the council)
     stage1_results = []
+    stage1_errors = []
     for model, response in responses.items():
-        if response is not None:  # Only include successful responses
+        if response is not None and response.get('content') is not None and response.get('error') is None:
             stage1_results.append({
                 "model": model,
-                "response": response.get('content', '')
+                "response": response['content']
+            })
+        elif response is not None and response.get('error') is not None:
+            stage1_errors.append({"model": model, "error": response['error']})
+        else:
+            stage1_errors.append({
+                "model": model,
+                "error": {"type": "unknown_error", "message": "No response."}
             })
 
-    return stage1_results
+    return stage1_results, stage1_errors
 
 
 async def stage2_collect_rankings(
     user_query: str,
     stage1_results: List[Dict[str, Any]]
-) -> Tuple[List[Dict[str, Any]], Dict[str, str]]:
+) -> Tuple[List[Dict[str, Any]], Dict[str, str], List[Dict[str, Any]]]:
     """
     Stage 2: Each model ranks the anonymized responses.
 
@@ -44,7 +55,7 @@ async def stage2_collect_rankings(
         stage1_results: Results from Stage 1
 
     Returns:
-        Tuple of (rankings list, label_to_model mapping)
+        Tuple of (rankings list, label_to_model mapping, per-model errors)
     """
     # Create anonymized labels for responses (Response A, Response B, etc.)
     labels = [chr(65 + i) for i in range(len(stage1_results))]  # A, B, C, ...
@@ -97,19 +108,27 @@ Now provide your evaluation and ranking:"""
     # Get rankings from all council models in parallel
     responses = await query_models_parallel(COUNCIL_MODELS, messages)
 
-    # Format results
+    # Format results and collect failures separately
     stage2_results = []
+    stage2_errors = []
     for model, response in responses.items():
-        if response is not None:
-            full_text = response.get('content', '')
+        if response is not None and response.get('content') is not None and response.get('error') is None:
+            full_text = response['content']
             parsed = parse_ranking_from_text(full_text)
             stage2_results.append({
                 "model": model,
                 "ranking": full_text,
                 "parsed_ranking": parsed
             })
+        elif response is not None and response.get('error') is not None:
+            stage2_errors.append({"model": model, "error": response['error']})
+        else:
+            stage2_errors.append({
+                "model": model,
+                "error": {"type": "unknown_error", "message": "No response."}
+            })
 
-    return stage2_results, label_to_model
+    return stage2_results, label_to_model, stage2_errors
 
 
 async def stage3_synthesize_final(
@@ -161,16 +180,19 @@ Provide a clear, well-reasoned final answer that represents the council's collec
     # Query the chairman model
     response = await query_model(CHAIRMAN_MODEL, messages)
 
-    if response is None:
-        # Fallback if chairman fails
+    if response is None or response.get('error') is not None or response.get('content') is None:
+        # Precise error message instead of a generic one
+        error = (response or {}).get('error') or {"type": "unknown_error", "message": "No response."}
         return {
             "model": CHAIRMAN_MODEL,
-            "response": "Error: Unable to generate final synthesis."
+            "response": f"Error: Unable to generate final synthesis. [{error['type']}] {error['message']}",
+            "error": error
         }
 
     return {
         "model": CHAIRMAN_MODEL,
-        "response": response.get('content', '')
+        "response": response['content'],
+        "error": None
     }
 
 
@@ -277,11 +299,11 @@ Title:"""
     # Use mistral-small-2603 for title generation (fast and cheap)
     response = await query_model("mistral-small-2603", messages, timeout=30.0)
 
-    if response is None:
+    if response is None or response.get('error') is not None or not response.get('content'):
         # Fallback to a generic title
         return "New Conversation"
 
-    title = response.get('content', 'New Conversation').strip()
+    title = response['content'].strip()
 
     # Clean up the title - remove quotes, limit length
     title = title.strip('"\'')
@@ -304,17 +326,19 @@ async def run_full_council(user_query: str) -> Tuple[List, List, Dict, Dict]:
         Tuple of (stage1_results, stage2_results, stage3_result, metadata)
     """
     # Stage 1: Collect individual responses
-    stage1_results = await stage1_collect_responses(user_query)
+    stage1_results, stage1_errors = await stage1_collect_responses(user_query)
 
     # If no models responded successfully, return error
     if not stage1_results:
+        first_error = stage1_errors[0]['error'] if stage1_errors else {"type": "unknown_error", "message": "No response."}
         return [], [], {
             "model": "error",
-            "response": "All models failed to respond. Please try again."
-        }, {}
+            "response": f"All models failed to respond. [{first_error['type']}] {first_error['message']}",
+            "error": first_error
+        }, {"model_errors": stage1_errors}
 
     # Stage 2: Collect rankings
-    stage2_results, label_to_model = await stage2_collect_rankings(user_query, stage1_results)
+    stage2_results, label_to_model, stage2_errors = await stage2_collect_rankings(user_query, stage1_results)
 
     # Calculate aggregate rankings
     aggregate_rankings = calculate_aggregate_rankings(stage2_results, label_to_model)
@@ -329,7 +353,8 @@ async def run_full_council(user_query: str) -> Tuple[List, List, Dict, Dict]:
     # Prepare metadata
     metadata = {
         "label_to_model": label_to_model,
-        "aggregate_rankings": aggregate_rankings
+        "aggregate_rankings": aggregate_rankings,
+        "model_errors": stage1_errors + stage2_errors
     }
 
     return stage1_results, stage2_results, stage3_result, metadata

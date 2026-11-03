@@ -1,7 +1,7 @@
 import ReactMarkdown from 'react-markdown';
 import './Stage3.css';
 
-export default function Stage3({ finalResponse }) {
+export default function Stage3({ finalResponse, modelErrors }) {
   if (!finalResponse) {
     return null;
   }
@@ -17,6 +17,23 @@ export default function Stage3({ finalResponse }) {
           <ReactMarkdown>{finalResponse.response}</ReactMarkdown>
         </div>
       </div>
+      {modelErrors && modelErrors.length > 0 && (
+        <div className="model-errors-box">
+          <div className="model-errors-title">
+            ⚠ Some council members were unavailable during this exchange:
+          </div>
+          <ul className="model-errors-list">
+            {modelErrors.map((e, i) => (
+              <li key={i}>
+                <span className="model-error-name">{e.model}</span>
+                <span className="model-error-detail">
+                  [{e.error?.type}] {e.error?.message}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

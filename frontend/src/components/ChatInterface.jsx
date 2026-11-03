@@ -103,7 +103,12 @@ export default function ChatInterface({
                       <span>Running Stage 3: Final synthesis...</span>
                     </div>
                   )}
-                  {msg.stage3 && <Stage3 finalResponse={msg.stage3} />}
+                  {msg.stage3 && (
+                    <Stage3
+                      finalResponse={msg.stage3}
+                      modelErrors={msg.metadata?.model_errors}
+                    />
+                  )}
                 </div>
               )}
             </div>
