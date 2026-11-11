@@ -16,18 +16,11 @@ body = """
 {% for group, commits in commits | group_by(attribute="group") %}
     ### {{ group | striptags | trim | upper_first }}
     {% for commit in commits %}
-        - {% if commit.breaking %}[**breaking**] {% endif %}{{ commit.message | upper_first }} ({{ commit.id | short }})
+        - {% if commit.breaking %}[**breaking**] {% endif %}{{ commit.message | upper_first }}
     {% endfor %}
 {% endfor %}
 """
 trim = true
-footer = """
-{% for release in releases -%}
-    {% if release.version == version -%}
-[{{ release.version }}]: https://github.com/drch13/llm-council-mistral-api/releases/tag/{{ release.version }}
-    {% endif -%}
-{% endfor %}
-"""
 
 [git]
 conventional_commits = true
