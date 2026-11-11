@@ -1,13 +1,13 @@
-name: Build Windows executable
+name: Build artifact
 
 on:
   push:
-    branches:
-      - master
+    branches: ['**']
+  pull_request:
   workflow_dispatch:
 
 jobs:
-  build-exe:
+  build-artifact:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,6 +34,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: LLM-Council-windows
+          name: LLM-Council-windows-${{ github.sha }}
           path: dist/LLM-Council.exe
           retention-days: 1

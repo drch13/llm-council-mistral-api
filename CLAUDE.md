@@ -125,6 +125,9 @@ All ReactMarkdown components must be wrapped in `<div className="markdown-conten
 ### Model Configuration
 Models are hardcoded in `backend/config.py`. Chairman can be same or different from council members. The current default is Mistral Large 4 as chairman.
 
+### Commit Conventions (Conventional Commits)
+All commit messages MUST follow [Conventional Commits](https://www.conventionalcommits.org/): `feat:` (new feature), `fix:` (bug fix), `docs:`, `ci:`, `refactor:`, `perf:`, `chore:`, and `!` or a `BREAKING CHANGE:` footer for breaking changes. This is required because the `release.yml` GitHub Actions workflow computes the Semantic Versioning bump and regenerates `CHANGELOG.md` (Keep a Changelog) from commit messages via git-cliff (`cliff.toml`). Non-conventional messages break the release pipeline.
+
 ## Common Gotchas
 
 1. **Module Import Errors**: Always run backend as `python -m backend.main` from project root, not from backend directory
