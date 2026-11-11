@@ -7,9 +7,28 @@ export default function Stage3({ finalResponse, modelErrors, t }) {
     return null;
   }
 
+  const handleDownload = () => {
+    const blob = new Blob([finalResponse.response], {
+      type: 'text/markdown;charset=utf-8',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'llm-council-final-answer.md';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="stage stage3">
-      <h3 className="stage-title">{t('stage3_title')}</h3>
+      <div className="stage3-header">
+        <h3 className="stage-title">{t('stage3_title')}</h3>
+        <button className="download-button" onClick={handleDownload}>
+          {t('download_markdown')}
+        </button>
+      </div>
       <div className="final-response">
         <div className="chairman-label">
           {t('chairman')} {finalResponse.model.split('/')[1] || finalResponse.model}
