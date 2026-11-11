@@ -4,6 +4,54 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [1.0.1] - 2026-11-11
+
+### Bug fixes
+
+- Make cliff.toml templates compatible with git-cliff 2.14 (drop short filter and footer)
+
+
+### CI
+
+- Name release exe after version tag (LLM-Council-vX.Y.Z.exe)
+
+- Install git-cliff via npm instead of GitHub release tarball (URL 404s)
+
+
+### Documentation
+
+- Add Keep a Changelog for v1.0.0, Conventional Commits rule and release pipeline
+
+
+### Other
+
+- Auto-create GitHub release with the .exe on tags v*
+
+- Revert "CI: auto-create GitHub release with the .exe on tags v*"
+
+This reverts commit 164140a07390facaab7ba7ac68dbefda1cdb5aa0.
+
+- Update README to clarify project purpose and remove sections
+
+Removed image reference and a section about the project's vibe coding. Clarified the project's purpose and functionality.
+
+- Fix Markdown table rendering by enabling remark-gfm in all ReactMarkdown components
+
+react-markdown v10 only supports CommonMark by default, so GFM tables
+were displayed as raw pipe-separated text. Add remark-gfm and pass it
+via remarkPlugins in Stage1, Stage2, Stage3 and ChatInterface, plus
+table styling in index.css.
+
+Co-authored-by: drch13 <drch13@users.noreply.github.com>
+
+- Merge pull request #2 from drch13/vibe/gfm-markdown-tables-3ac28b
+
+Fix Markdown table rendering (enable remark-gfm)
+
+- Merge pull request #3 from drch13/vibe/fix-git-cliff-install-3ac28b
+
+Fix release.yml: install git-cliff via npm (GitHub tarball URL 404s)
+
 
 ## [Unreleased]
 
