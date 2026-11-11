@@ -67,13 +67,13 @@ jobs:
           npm run build
 
       - name: Package executable with PyInstaller
-        run: uv run --with pyinstaller pyinstaller --onefile --name LLM-Council --collect-all uvicorn --add-data "frontend/dist;dist" --add-data "backend/prompts;backend/prompts" run_app.py
+        run: uv run --with pyinstaller pyinstaller --onefile --name LLM-Council-v${{ needs.changelog.outputs.next_version }} --collect-all uvicorn --add-data "frontend/dist;dist" --add-data "backend/prompts;backend/prompts" run_app.py
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: LLM-Council-windows-release
-          path: dist/LLM-Council.exe
+          path: dist/LLM-Council-v${{ needs.changelog.outputs.next_version }}.exe
           retention-days: 1
 
   release:
@@ -90,4 +90,4 @@ jobs:
         with:
           tag_name: v${{ needs.changelog.outputs.next_version }}
           name: v${{ needs.changelog.outputs.next_version }} — LLM Council (Windows executable)
-          files: dist/LLM-Council.exe
+          files: dist/LLM-Council-v${{ needs.changelog.outputs.next_version }}.exe
