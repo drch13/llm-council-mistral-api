@@ -27,7 +27,7 @@ jobs:
 
       - name: Compute next version (SemVer bump from Conventional Commits since last tag)
         id: version
-        run: echo "next_version=$(git cliff --bumped-version)" >> "$GITHUB_OUTPUT"
+        run: echo "next_version=$(git cliff --bumped-version | sed 's/^v//')" >> "$GITHUB_OUTPUT"
 
       - name: Regenerate CHANGELOG.md (Keep a Changelog, prepend new section)
         run: git cliff --unreleased --tag "v${{ steps.version.outputs.next_version }}" --prepend CHANGELOG.md
