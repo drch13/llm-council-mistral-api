@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [1.1.0] - 2026-11-12
+
+### Bug fixes
+
+- Strip leading v from git-cliff bumped version so exe is named LLM-Council-vX.Y.Z.exe
+
+
+### Features
+
+- Add button to download stage 3 final answer as a Markdown file
+
+
+### Other
+
+- Merge pull request #4 from drch13/vibe/stage3-md-download-exe-version-4dc4f0
+
+feat: download stage 3 answer as Markdown + fix exe version naming (vvX.Y.Z)
+
 ## [1.0.1] - 2026-11-11
 
 ### Bug fixes
