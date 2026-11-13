@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [1.1.1] - 2026-11-13
+
+### Bug fixes
+
+- Persist assistant message metadata (aggregate rankings) in storage
+
+
+### Other
+
+- Merge pull request #5 from drch13/vibe/persist-stage-metadata-145aa9
+
+fix: persist assistant message metadata (aggregate rankings) in storage
+
 ## [1.1.0] - 2026-11-12
 
 ### Bug fixes
