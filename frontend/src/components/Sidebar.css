@@ -50,11 +50,34 @@
 }
 
 .conversation-item {
+  position: relative;
   padding: 12px;
+  padding-right: 36px;
   margin-bottom: 4px;
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.2s;
+}
+
+.delete-conversation-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.conversation-item:hover .delete-conversation-btn {
+  opacity: 1;
+}
+
+.delete-conversation-btn:hover {
+  transform: scale(1.15);
 }
 
 .conversation-item:hover {

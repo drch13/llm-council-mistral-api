@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Sidebar from './components/Sidebar';
 import ChatInterface from './components/ChatInterface';
 import SettingsModal from './components/SettingsModal';
+import ConfirmDeleteModal from './components/ConfirmDeleteModal';
 import { api } from './api';
 import { createT } from './i18n';
 import './App.css';
@@ -12,6 +13,7 @@ function App() {
   const [currentConversation, setCurrentConversation] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [conversationToDelete, setConversationToDelete] = useState(null);
   const [language, setLanguage] = useState('en');
 
   const t = useMemo(() => createT(language), [language]);
@@ -62,6 +64,26 @@ function App() {
 
   const handleSelectConversation = (id) => {
     setCurrentConversationId(id);
+  };
+
+  const handleDeleteConversation = (conv) => {
+    setConversationToDelete(conv);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!conversationToDelete) return;
+    try {
+      await api.deleteConversation(conversationToDelete.id);
+      if (currentConversationId === conversationToDelete.id) {
+        setCurrentConversationId(null);
+        setCurrentConversation(null);
+      }
+      await loadConversations();
+    } catch (error) {
+      console.error('Failed to delete conversation:', error);
+    } finally {
+      setConversationToDelete(null);
+    }
   };
 
   const handleSendMessage = async (content) => {
@@ -196,6 +218,7 @@ function App() {
         onSelectConversation={handleSelectConversation}
         onNewConversation={handleNewConversation}
         onOpenSettings={() => setSettingsOpen(true)}
+        onDeleteConversation={handleDeleteConversation}
         t={t}
       />
       <ChatInterface
@@ -210,6 +233,14 @@ function App() {
           t={t}
           language={language}
           onLanguageChange={setLanguage}
+        />
+      )}
+      {conversationToDelete && (
+        <ConfirmDeleteModal
+          conversation={conversationToDelete}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setConversationToDelete(null)}
+          t={t}
         />
       )}
     </div>
