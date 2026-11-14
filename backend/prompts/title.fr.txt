@@ -1,0 +1,6 @@
+Génère un titre très court (3 à 5 mots maximum) qui résume la question suivante.
+Le titre doit être concis et descriptif. N'utilise ni guillemets ni ponctuation dans le titre.
+
+Question : {{USER_QUERY}}
+
+Titre :

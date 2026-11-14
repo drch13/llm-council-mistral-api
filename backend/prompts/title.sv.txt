@@ -1,0 +1,6 @@
+Generera en mycket kort titel (maximalt 3-5 ord) som sammanfattar följande fråga.
+Titeln ska vara koncis och beskrivande. Använd inte citattecken eller skiljetecken i titeln.
+
+Fråga: {{USER_QUERY}}
+
+Titel:

@@ -1,0 +1,6 @@
+Erstelle einen sehr kurzen Titel (maximal 3-5 Wörter), der die folgende Frage zusammenfasst.
+Der Titel soll prägnant und beschreibend sein. Verwende keine Anführungszeichen oder Satzzeichen im Titel.
+
+Frage: {{USER_QUERY}}
+
+Titel:

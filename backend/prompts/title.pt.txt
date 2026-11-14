@@ -1,0 +1,6 @@
+Gere um título muito curto (máximo de 3 a 5 palavras) que resuma a seguinte pergunta.
+O título deve ser conciso e descritivo. Não use aspas nem pontuação no título.
+
+Pergunta: {{USER_QUERY}}
+
+Título:
