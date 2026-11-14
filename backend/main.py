@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import uuid
 import json
 import asyncio
@@ -68,7 +68,7 @@ class ConversationMetadata(BaseModel):
     id: str
     created_at: str
     title: str
-    language: str
+    language: Optional[str] = None  # None for conversations created before this field existed
     message_count: int
 
 
@@ -77,7 +77,7 @@ class Conversation(BaseModel):
     id: str
     created_at: str
     title: str
-    language: str
+    language: Optional[str] = None  # None for conversations created before this field existed
     messages: List[Dict[str, Any]]
 
 

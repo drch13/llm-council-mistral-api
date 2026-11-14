@@ -65,11 +65,7 @@ def get_conversation(conversation_id: str) -> Optional[Dict[str, Any]]:
         return None
 
     with open(path, 'r') as f:
-        conversation = json.load(f)
-
-    # Conversations created before the language field existed
-    conversation.setdefault("language", config.LANGUAGE or "en")
-    return conversation
+        return json.load(f)
 
 
 def save_conversation(conversation: Dict[str, Any]):
@@ -106,7 +102,7 @@ def list_conversations() -> List[Dict[str, Any]]:
                     "id": data["id"],
                     "created_at": data["created_at"],
                     "title": data.get("title", "New Conversation"),
-                    "language": data.get("language", config.LANGUAGE or "en"),
+                    "language": data.get("language"),
                     "message_count": len(data["messages"])
                 })
 
