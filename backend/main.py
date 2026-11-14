@@ -68,6 +68,7 @@ class ConversationMetadata(BaseModel):
     id: str
     created_at: str
     title: str
+    language: str
     message_count: int
 
 
@@ -76,6 +77,7 @@ class Conversation(BaseModel):
     id: str
     created_at: str
     title: str
+    language: str
     messages: List[Dict[str, Any]]
 
 
@@ -162,7 +164,7 @@ async def list_conversations():
 async def create_conversation(request: CreateConversationRequest):
     """Create a new conversation."""
     conversation_id = str(uuid.uuid4())
-    conversation = storage.create_conversation(conversation_id)
+    conversation = storage.create_conversation(conversation_id, language=config.LANGUAGE)
     return conversation
 
 
