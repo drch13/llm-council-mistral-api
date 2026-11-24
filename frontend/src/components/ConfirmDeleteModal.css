@@ -1,0 +1,48 @@
+.confirm-delete-modal {
+  max-width: 420px;
+}
+
+.confirm-delete-message {
+  color: #333;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.confirm-delete-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.cancel-btn {
+  padding: 8px 16px;
+  background: none;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  color: #555;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.cancel-btn:hover {
+  background: #f0f0f0;
+}
+
+.confirm-delete-btn {
+  padding: 8px 16px;
+  background: #d9534f;
+  border: 1px solid #d9534f;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.confirm-delete-btn:hover {
+  background: #c9302c;
+  border-color: #c9302c;
+}

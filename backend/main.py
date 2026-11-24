@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import uuid
 import json
 import asyncio
@@ -68,6 +68,7 @@ class ConversationMetadata(BaseModel):
     id: str
     created_at: str
     title: str
+    language: Optional[str] = None  # None for conversations created before this field existed
     message_count: int
 
 
@@ -76,6 +77,7 @@ class Conversation(BaseModel):
     id: str
     created_at: str
     title: str
+    language: Optional[str] = None  # None for conversations created before this field existed
     messages: List[Dict[str, Any]]
 
 
@@ -162,7 +164,7 @@ async def list_conversations():
 async def create_conversation(request: CreateConversationRequest):
     """Create a new conversation."""
     conversation_id = str(uuid.uuid4())
-    conversation = storage.create_conversation(conversation_id)
+    conversation = storage.create_conversation(conversation_id, language=config.LANGUAGE)
     return conversation
 
 
@@ -173,6 +175,14 @@ async def get_conversation(conversation_id: str):
     if conversation is None:
         raise HTTPException(status_code=404, detail="Conversation not found")
     return conversation
+
+
+@app.delete("/api/conversations/{conversation_id}")
+async def delete_conversation(conversation_id: str):
+    """Delete a conversation."""
+    if not storage.delete_conversation(conversation_id):
+        raise HTTPException(status_code=404, detail="Conversation not found")
+    return {"ok": True}
 
 
 @app.post("/api/conversations/{conversation_id}/message")

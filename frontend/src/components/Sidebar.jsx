@@ -7,6 +7,7 @@ export default function Sidebar({
   onSelectConversation,
   onNewConversation,
   onOpenSettings,
+  onDeleteConversation,
   t,
 }) {
   return (
@@ -36,6 +37,17 @@ export default function Sidebar({
               <div className="conversation-meta">
                 {t('messages_count', { count: conv.message_count })}
               </div>
+              <button
+                className="delete-conversation-btn"
+                title={t('delete_conversation')}
+                aria-label={t('delete_conversation')}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDeleteConversation(conv);
+                }}
+              >
+                🗑
+              </button>
             </div>
           ))
         )}

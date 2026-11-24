@@ -1,0 +1,6 @@
+Genera un titolo molto breve (massimo 3-5 parole) che riassume la seguente domanda.
+Il titolo deve essere conciso e descrittivo. Non usare virgolette o punteggiatura nel titolo.
+
+Domanda: {{USER_QUERY}}
+
+Titolo:

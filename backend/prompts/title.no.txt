@@ -1,0 +1,6 @@
+Lag en veldig kort tittel (maksimalt 3-5 ord) som oppsummerer følgende spørsmål.
+Tittelen skal være konsis og beskrivende. Ikke bruk sitattegn eller skilletegn i tittelen.
+
+Spørsmål: {{USER_QUERY}}
+
+Tittel:
