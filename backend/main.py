@@ -6,20 +6,28 @@ from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
+from contextlib import asynccontextmanager
 import uuid
 import json
 import asyncio
 import sys
 from pathlib import Path
 
-import httpx
 from dotenv import set_key
 
 from . import config
 from . import storage
+from .mistral import get_client, close_client
 from .council import run_full_council, generate_conversation_title, stage1_collect_responses, stage2_collect_rankings, stage3_synthesize_final, calculate_aggregate_rankings
 
-app = FastAPI(title="LLM Council API")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+    await close_client()
+
+
+app = FastAPI(title="LLM Council API", lifespan=lifespan)
 
 
 def _frontend_dist() -> Path | None:
@@ -112,11 +120,11 @@ async def save_api_key(request: ApiKeyRequest):
     # Validate the key against the Mistral API before saving it
     key_valid = None
     try:
-        async with httpx.AsyncClient(timeout=15.0) as client:
-            response = await client.get(
-                config.MISTRAL_MODELS_URL,
-                headers={"Authorization": f"Bearer {key}"},
-            )
+        response = await get_client().get(
+            config.MISTRAL_MODELS_URL,
+            headers={"Authorization": f"Bearer {key}"},
+            timeout=15.0,
+        )
         if response.status_code in (401, 403):
             return JSONResponse(
                 status_code=400,
@@ -202,15 +210,20 @@ async def send_message(conversation_id: str, request: SendMessageRequest):
     # Add user message
     storage.add_user_message(conversation_id, request.content)
 
-    # If this is the first message, generate a title
+    # If this is the first message, generate a title in parallel with the council
+    title_task = None
     if is_first_message:
-        title = await generate_conversation_title(request.content)
-        storage.update_conversation_title(conversation_id, title)
+        title_task = asyncio.create_task(generate_conversation_title(request.content))
 
     # Run the 3-stage council process
     stage1_results, stage2_results, stage3_result, metadata = await run_full_council(
         request.content
     )
+
+    # Wait for title generation if it was started
+    if title_task:
+        title = await title_task
+        storage.update_conversation_title(conversation_id, title)
 
     # Add assistant message with all stages
     storage.add_assistant_message(
@@ -258,6 +271,27 @@ async def send_message_stream(conversation_id: str, request: SendMessageRequest)
             yield f"data: {json.dumps({'type': 'stage1_start'})}\n\n"
             stage1_results, stage1_errors = await stage1_collect_responses(request.content)
             yield f"data: {json.dumps({'type': 'stage1_complete', 'data': stage1_results})}\n\n"
+
+            # If no model responded, skip stages 2-3 (no API calls wasted) and
+            # report the error the same way the non-streaming endpoint does
+            if not stage1_results:
+                first_error = stage1_errors[0]['error'] if stage1_errors else {"type": "unknown_error", "message": "No response."}
+                stage3_result = {
+                    "model": "error",
+                    "response": f"All models failed to respond. [{first_error['type']}] {first_error['message']}",
+                    "error": first_error
+                }
+                metadata = {"label_to_model": {}, "aggregate_rankings": [], "model_errors": stage1_errors}
+                yield f"data: {json.dumps({'type': 'stage2_complete', 'data': [], 'metadata': metadata})}\n\n"
+                yield f"data: {json.dumps({'type': 'stage3_start'})}\n\n"
+                yield f"data: {json.dumps({'type': 'stage3_complete', 'data': stage3_result})}\n\n"
+                if title_task:
+                    title = await title_task
+                    storage.update_conversation_title(conversation_id, title)
+                    yield f"data: {json.dumps({'type': 'title_complete', 'data': {'title': title}})}\n\n"
+                storage.add_assistant_message(conversation_id, stage1_results, [], stage3_result, metadata)
+                yield f"data: {json.dumps({'type': 'complete'})}\n\n"
+                return
 
             # Stage 2: Collect rankings
             yield f"data: {json.dumps({'type': 'stage2_start'})}\n\n"
@@ -310,4 +344,4 @@ if _frontend_dist_path is not None:
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    uvicorn.run(app, host="127.0.0.1", port=8001)
