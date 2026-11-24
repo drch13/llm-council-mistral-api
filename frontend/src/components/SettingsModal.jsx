@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../api';
-import { LANGUAGES } from '../i18n';
+import { LANGUAGES, createT } from '../i18n';
 import './SettingsModal.css';
 
 export default function SettingsModal({ onClose, t, language, onLanguageChange }) {
@@ -22,14 +22,22 @@ export default function SettingsModal({ onClose, t, language, onLanguageChange }
     setSaving(true);
     setMessage(null);
     try {
-      const result = await api.saveApiKey(apiKey);
-      if (result.key_valid === true) {
-        setMessage({ type: 'success', text: t('save_success_validated') });
-      } else {
-        setMessage({ type: 'success', text: t('save_success_unvalidated') });
+      if (apiKey.trim()) {
+        const result = await api.saveApiKey(apiKey);
+        if (result.key_valid === true) {
+          setMessage({ type: 'success', text: t('save_success_validated') });
+        } else {
+          setMessage({ type: 'success', text: t('save_success_unvalidated') });
+        }
+        setApiKey('');
+        setStatus(await api.getApiKeyStatus());
       }
-      setApiKey('');
-      setStatus(await api.getApiKeyStatus());
+      if (selectedLanguage !== language) {
+        await api.saveLanguage(selectedLanguage);
+        onLanguageChange(selectedLanguage);
+        // Message in the NEW language, not the previous one
+        setMessage({ type: 'success', text: createT(selectedLanguage)('language_saved') });
+      }
     } catch (error) {
       setMessage({ type: 'error', text: error.message });
     } finally {
@@ -37,16 +45,10 @@ export default function SettingsModal({ onClose, t, language, onLanguageChange }
     }
   };
 
-  const handleLanguageChange = async (e) => {
-    const lang = e.target.value;
-    setSelectedLanguage(lang);
-    try {
-      await api.saveLanguage(lang);
-      onLanguageChange(lang);
-      setMessage({ type: 'success', text: t('language_saved') });
-    } catch (error) {
-      setMessage({ type: 'error', text: error.message });
-    }
+  const handleLanguageChange = (e) => {
+    // Only update the local selection; persisted by the Save button
+    setSelectedLanguage(e.target.value);
+    setMessage(null);
   };
 
   return (
@@ -108,7 +110,7 @@ export default function SettingsModal({ onClose, t, language, onLanguageChange }
           <button
             className="save-btn"
             onClick={handleSave}
-            disabled={saving || !apiKey.trim()}
+            disabled={saving || (!apiKey.trim() && selectedLanguage === language)}
           >
             {saving ? t('saving') : t('save')}
           </button>
