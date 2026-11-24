@@ -1,6 +1,6 @@
 .stage3 {
-  background: #f0fff0;
-  border-color: #c8e6c8;
+  background: var(--stage3-bg);
+  border-color: var(--stage3-border);
 }
 
 .stage3-header {
@@ -17,10 +17,10 @@
 
 .download-button {
   padding: 6px 14px;
-  background: #4a90e2;
-  border: 1px solid #4a90e2;
+  background: var(--primary);
+  border: 1px solid var(--primary);
   border-radius: 6px;
-  color: #fff;
+  color: var(--on-primary);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -29,19 +29,19 @@
 }
 
 .download-button:hover {
-  background: #357abd;
-  border-color: #357abd;
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
 }
 
 .final-response {
-  background: #ffffff;
+  background: var(--surface);
   padding: 20px;
   border-radius: 6px;
-  border: 1px solid #c8e6c8;
+  border: 1px solid var(--stage3-border);
 }
 
 .chairman-label {
-  color: #2d8a2d;
+  color: var(--chairman-text);
   font-size: 12px;
   font-family: monospace;
   margin-bottom: 12px;
@@ -49,7 +49,7 @@
 }
 
 .final-text {
-  color: #333;
+  color: var(--text);
   line-height: 1.7;
   font-size: 15px;
 }
@@ -57,14 +57,14 @@
 .model-errors-box {
   margin-top: 12px;
   padding: 12px 16px;
-  background: #fff8e6;
-  border: 1px solid #f0d48a;
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-border);
   border-radius: 6px;
   font-size: 13px;
 }
 
 .model-errors-title {
-  color: #8a6d1a;
+  color: var(--warning-text);
   font-weight: 600;
   margin-bottom: 6px;
 }
@@ -81,10 +81,10 @@
 .model-error-name {
   font-family: monospace;
   font-weight: 600;
-  color: #333;
+  color: var(--text);
   margin-right: 6px;
 }
 
 .model-error-detail {
-  color: #8a6d1a;
+  color: var(--warning-text);
 }
