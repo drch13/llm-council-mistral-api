@@ -2,6 +2,7 @@
 
 import json
 import os
+import uuid
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 from pathlib import Path
@@ -15,8 +16,16 @@ def ensure_data_dir():
 
 
 def get_conversation_path(conversation_id: str) -> str:
-    """Get the file path for a conversation."""
-    return os.path.join(DATA_DIR, f"{conversation_id}.json")
+    """Get the file path for a conversation.
+
+    Raises ValueError for malformed ids so they can never be used for
+    path traversal (e.g. backslash separators on Windows).
+    """
+    try:
+        canonical = str(uuid.UUID(conversation_id))
+    except (ValueError, AttributeError, TypeError):
+        raise ValueError(f"Invalid conversation id: {conversation_id!r}")
+    return os.path.join(DATA_DIR, f"{canonical}.json")
 
 
 def create_conversation(conversation_id: str, language: str = None) -> Dict[str, Any]:
@@ -59,7 +68,10 @@ def get_conversation(conversation_id: str) -> Optional[Dict[str, Any]]:
     Returns:
         Conversation dict or None if not found
     """
-    path = get_conversation_path(conversation_id)
+    try:
+        path = get_conversation_path(conversation_id)
+    except ValueError:
+        return None
 
     if not os.path.exists(path):
         return None
