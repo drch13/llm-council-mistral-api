@@ -15,8 +15,15 @@ function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [conversationToDelete, setConversationToDelete] = useState(null);
   const [language, setLanguage] = useState('en');
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
 
   const t = useMemo(() => createT(language), [language]);
+
+  // Apply and persist the UI theme (light/dark) on the root element
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   // Load conversations and language on mount
   useEffect(() => {
@@ -233,6 +240,8 @@ function App() {
           t={t}
           language={language}
           onLanguageChange={setLanguage}
+          theme={theme}
+          onThemeChange={setTheme}
         />
       )}
       {conversationToDelete && (

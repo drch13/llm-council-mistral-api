@@ -3,11 +3,12 @@ import { api } from '../api';
 import { LANGUAGES, createT } from '../i18n';
 import './SettingsModal.css';
 
-export default function SettingsModal({ onClose, t, language, onLanguageChange }) {
+export default function SettingsModal({ onClose, t, language, onLanguageChange, theme, onThemeChange }) {
   const [apiKey, setApiKey] = useState('');
   const [showKey, setShowKey] = useState(false);
   const [status, setStatus] = useState(null);
   const [selectedLanguage, setSelectedLanguage] = useState(language || 'en');
+  const [selectedTheme, setSelectedTheme] = useState(theme || 'light');
   const [message, setMessage] = useState(null);
   const [saving, setSaving] = useState(false);
 
@@ -100,6 +101,23 @@ export default function SettingsModal({ onClose, t, language, onLanguageChange }
                 {l.label}
               </option>
             ))}
+          </select>
+
+          <label className="settings-label settings-language-label" htmlFor="theme-select">
+            {t('theme_label')}
+          </label>
+          <select
+            id="theme-select"
+            className="language-select"
+            value={selectedTheme}
+            onChange={(e) => {
+              // Theme is a purely client-side preference: applied immediately
+              setSelectedTheme(e.target.value);
+              onThemeChange(e.target.value);
+            }}
+          >
+            <option value="light">{t('theme_light')}</option>
+            <option value="dark">{t('theme_dark')}</option>
           </select>
 
           {message && (

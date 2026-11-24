@@ -1,7 +1,7 @@
 .sidebar {
   width: 260px;
-  background: #f8f8f8;
-  border-right: 1px solid #e0e0e0;
+  background: var(--surface-alt);
+  border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -9,22 +9,22 @@
 
 .sidebar-header {
   padding: 16px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--border);
 }
 
 .sidebar-header h1 {
   font-size: 18px;
   margin: 0 0 12px 0;
-  color: #333;
+  color: var(--text);
 }
 
 .new-conversation-btn {
   width: 100%;
   padding: 10px;
-  background: #4a90e2;
-  border: 1px solid #4a90e2;
+  background: var(--primary);
+  border: 1px solid var(--primary);
   border-radius: 6px;
-  color: #fff;
+  color: var(--on-primary);
   cursor: pointer;
   font-size: 14px;
   transition: background 0.2s;
@@ -32,8 +32,8 @@
 }
 
 .new-conversation-btn:hover {
-  background: #357abd;
-  border-color: #357abd;
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
 }
 
 .conversation-list {
@@ -45,7 +45,7 @@
 .no-conversations {
   padding: 16px;
   text-align: center;
-  color: #999;
+  color: var(--text-muted);
   font-size: 14px;
 }
 
@@ -70,6 +70,7 @@
   font-size: 14px;
   opacity: 0;
   transition: opacity 0.2s;
+  color: var(--text-muted);
 }
 
 .conversation-item:hover .delete-conversation-btn {
@@ -81,42 +82,42 @@
 }
 
 .conversation-item:hover {
-  background: #f0f0f0;
+  background: var(--surface-hover);
 }
 
 .conversation-item.active {
-  background: #e8f0fe;
-  border: 1px solid #4a90e2;
+  background: var(--surface-active);
+  border: 1px solid var(--primary);
 }
 
 .conversation-title {
-  color: #333;
+  color: var(--text);
   font-size: 14px;
   margin-bottom: 4px;
 }
 
 .conversation-meta {
-  color: #999;
+  color: var(--text-muted);
   font-size: 12px;
 }
 
 .sidebar-footer {
   padding: 12px 16px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--border);
 }
 
 .settings-btn {
   width: 100%;
   padding: 10px;
   background: none;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-strong);
   border-radius: 6px;
-  color: #555;
+  color: var(--text-mid);
   cursor: pointer;
   font-size: 14px;
   transition: background 0.2s;
 }
 
 .settings-btn:hover {
-  background: #f0f0f0;
+  background: var(--surface-hover);
 }
