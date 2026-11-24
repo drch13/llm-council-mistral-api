@@ -5,6 +5,25 @@ from typing import List, Dict, Any, Optional
 from . import config
 
 
+_client: Optional[httpx.AsyncClient] = None
+
+
+def get_client() -> httpx.AsyncClient:
+    """Return the shared async HTTP client (keep-alive connection pooling)."""
+    global _client
+    if _client is None:
+        _client = httpx.AsyncClient()
+    return _client
+
+
+async def close_client() -> None:
+    """Close the shared client (called on application shutdown)."""
+    global _client
+    if _client is not None:
+        await _client.aclose()
+        _client = None
+
+
 def _extract_content(message: Dict[str, Any]) -> Optional[str]:
     """Extract text content from a Mistral message (string or chunk list)."""
     content = message.get('content')
@@ -81,22 +100,22 @@ async def query_model(
     }
 
     try:
-        async with httpx.AsyncClient(timeout=timeout) as client:
-            response = await client.post(
-                config.MISTRAL_API_URL,
-                headers=headers,
-                json=payload
-            )
-            response.raise_for_status()
+        response = await get_client().post(
+            config.MISTRAL_API_URL,
+            headers=headers,
+            json=payload,
+            timeout=timeout,
+        )
+        response.raise_for_status()
 
-            data = response.json()
-            message = data['choices'][0]['message']
+        data = response.json()
+        message = data['choices'][0]['message']
 
-            return {
-                'content': _extract_content(message),
-                'reasoning_details': message.get('reasoning_details'),
-                'error': None
-            }
+        return {
+            'content': _extract_content(message),
+            'reasoning_details': message.get('reasoning_details'),
+            'error': None
+        }
 
     except Exception as e:
         error = classify_error(e)
